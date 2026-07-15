@@ -30,4 +30,5 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            pm2 restart all
+            cd /home/${{ secrets.VPS_USERNAME }}/sample-project
+            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js

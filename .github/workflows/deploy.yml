@@ -1,0 +1,35 @@
+name: CI/CD Pipeline cho Workshop
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Lấy Code Mới Nhất
+        uses: actions/checkout@v3
+
+      - name: 🚀 Copy Code Lên VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "."
+          target: "/home/${{ secrets.VPS_USERNAME }}/sample-project"
+
+      - name: 🔄 Khởi Động Lại Server (Tùy Chọn)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /home/${{ secrets.VPS_USERNAME }}/sample-project
+            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
